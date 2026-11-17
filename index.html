@@ -1,0 +1,694 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>body{margin:0}</style>
+<title>Прогулка по Петербургу</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Inter:wght@400;500;600&display=swap">
+<style>
+/* Раскладка: шапка, заголовок с двумя лентами иллюстраций под ним, затем сцена экскурсии: кадр слева, рассказ и схема справа. */
+:root{
+  --bg:#0a1124;
+  --panel:#111a35;
+  --ink:#edf0fa;
+  --muted:#a7b1cd;
+  --line:rgba(237,240,250,.14);
+  --gold:#e6c27b;
+  --display:'Cormorant Garamond','Times New Roman',serif;
+  --body:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);color:var(--ink);
+  font-family:var(--body);font-size:16px;line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+button{font-family:inherit}
+.wrap{
+  width:100%;max-width:1240px;margin:0 auto;
+  padding-left:max(20px,env(safe-area-inset-left,0px));
+  padding-right:max(20px,env(safe-area-inset-right,0px));
+}
+
+/* ---------- кнопки с лентой фотографий ---------- */
+.btn{
+  position:relative;display:inline-flex;align-items:center;justify-content:center;
+  min-height:56px;padding:0 28px;
+  border:1px solid rgba(255,255,255,.28);border-radius:14px;
+  color:#fff;font:600 16px/1 var(--body);letter-spacing:.01em;
+  cursor:pointer;overflow:hidden;isolation:isolate;background:#0d1530;
+  transition:transform .4s cubic-bezier(.2,.8,.2,1),box-shadow .4s,border-color .4s;
+}
+.btn .reel{
+  position:absolute;inset:0;z-index:-2;display:flex;width:max-content;height:100%;
+  animation:drift-left 40s linear infinite;will-change:transform;
+}
+.btn[data-dir="right"] .reel{animation-name:drift-right}
+.btn .reel img{flex:none;height:100%;width:120px;object-fit:cover;display:block}
+.btn::before{
+  content:"";position:absolute;inset:0;z-index:-1;
+  background:linear-gradient(90deg,rgba(8,13,36,.74),rgba(8,13,36,.46) 50%,rgba(8,13,36,.74));
+  transition:opacity .5s;
+}
+.btn::after{
+  content:"";position:absolute;inset:0;z-index:-1;
+  background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.26) 50%,transparent 70%);
+  transform:translateX(-120%);transition:transform .9s cubic-bezier(.2,.8,.2,1);
+}
+.btn:hover{transform:translateY(-2px);box-shadow:0 16px 36px -14px rgba(230,194,123,.55);border-color:rgba(230,194,123,.85)}
+.btn:hover::before{opacity:.6}
+.btn:hover::after{transform:translateX(120%)}
+.btn:active{transform:translateY(0) scale(.98)}
+.btn:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+.btn .label{position:relative;display:inline-flex;align-items:center;gap:10px;text-shadow:0 1px 12px rgba(0,0,0,.65)}
+@keyframes drift-left{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes drift-right{from{transform:translateX(-50%)}to{transform:translateX(0)}}
+
+/* ---------- шапка и первый экран ---------- */
+.top{padding-block:22px}
+.bar{display:flex;justify-content:space-between;align-items:center;gap:8px 24px;flex-wrap:wrap}
+.brand{font:600 13px var(--body);letter-spacing:.18em;text-transform:uppercase}
+.coord{color:var(--muted);font-size:13px;font-variant-numeric:tabular-nums}
+
+.hero{
+  padding-block:clamp(28px,6vw,72px) clamp(36px,6vw,64px);
+  background:
+    radial-gradient(900px 480px at 88% -8%,rgba(230,194,123,.17),transparent 62%),
+    radial-gradient(760px 520px at -6% 100%,rgba(95,119,181,.2),transparent 60%),
+    var(--bg);
+}
+.eyebrow{margin:0 0 18px;font:600 12px var(--body);letter-spacing:.2em;text-transform:uppercase;color:var(--gold)}
+h1{
+  margin:0;font:500 clamp(54px,10.5vw,124px)/.92 var(--display);letter-spacing:-.01em;text-wrap:balance;
+}
+h1 em{font-style:italic;font-weight:500;color:var(--gold)}
+.lead{max-width:56ch;margin:26px 0 0;font-size:clamp(16px,1.9vw,19px);color:var(--muted);line-height:1.65}
+.cta{display:flex;flex-wrap:wrap;gap:14px;margin-top:32px}
+.facts{display:flex;flex-wrap:wrap;gap:18px 44px;margin:38px 0 0;padding:0}
+.facts div{min-width:0}
+.facts dt{font:600 11px var(--body);letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.facts dd{margin:4px 0 0;font:500 clamp(24px,3.4vw,32px)/1.1 var(--display);font-variant-numeric:lining-nums}
+
+.ribbons{display:grid;gap:10px;margin-top:clamp(36px,6vw,60px)}
+.rib{
+  height:150px;overflow:hidden;
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);
+  mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);
+}
+.rib .track{display:flex;width:max-content;height:100%;animation:drift-left 120s linear infinite;will-change:transform}
+.rib.r .track{animation-name:drift-right;animation-duration:140s}
+.rib img{flex:none;height:100%;width:225px;margin-right:10px;object-fit:cover;border-radius:8px;display:block}
+
+/* ---------- экскурсия ---------- */
+.tour{padding-block:clamp(48px,7vw,96px)}
+.tour-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:end;gap:12px 32px;margin-bottom:28px}
+.tour-head h2{margin:0;font:500 clamp(36px,5vw,56px)/1 var(--display)}
+.tour-head p{margin:0;color:var(--muted);font-size:14px;max-width:44ch}
+.tour-grid{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:clamp(28px,4.5vw,64px);align-items:start}
+
+.frame{
+  position:relative;aspect-ratio:3/2;max-width:100%;overflow:hidden;isolation:isolate;
+  border-radius:18px;background:var(--panel);touch-action:pan-y;
+  box-shadow:0 34px 80px -34px rgba(0,0,0,.8),0 0 0 1px var(--line);
+}
+.layers{position:absolute;inset:0}
+.layer{position:absolute;inset:0;overflow:hidden}
+.layer img{width:100%;height:100%;object-fit:cover;display:block;animation:kb 18s ease-in-out infinite alternate}
+@keyframes kb{from{transform:scale(1)}to{transform:scale(1.09) translateX(-1.5%)}}
+.frame::after{
+  content:"";position:absolute;inset:auto 0 0 0;height:48%;z-index:1;pointer-events:none;
+  background:linear-gradient(to top,rgba(6,10,26,.82),transparent);
+}
+.frame-top{position:absolute;top:0;left:0;right:0;z-index:2;display:flex;padding:16px 18px}
+.chip{
+  padding:6px 12px;border-radius:6px;background:rgba(8,13,36,.55);
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+  font:600 12px var(--body);letter-spacing:.12em;font-variant-numeric:tabular-nums;
+}
+.frame-bottom{
+  position:absolute;left:0;right:0;bottom:0;z-index:2;
+  display:flex;justify-content:space-between;align-items:flex-end;gap:16px;padding:18px 20px;
+}
+.coords{font-size:12px;letter-spacing:.06em;color:rgba(237,240,250,.86);font-variant-numeric:tabular-nums}
+.year{display:flex;flex-direction:column;align-items:flex-end;text-align:right}
+.year b{font:500 clamp(40px,6vw,64px)/.9 var(--display);font-variant-numeric:lining-nums;color:var(--gold)}
+.year span{margin-top:6px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgba(237,240,250,.86)}
+
+.controls{display:flex;flex-wrap:wrap;gap:12px;margin-top:20px}
+.controls .btn{flex:1 1 150px;padding:0 20px}
+
+.timeline{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:6px;margin-top:14px}
+.seg{
+  appearance:none;background:none;border:0;padding:10px 0 6px;cursor:pointer;color:var(--muted);
+  font:500 12px/1 var(--body);text-align:left;font-variant-numeric:tabular-nums;
+}
+.seg .bar2{display:block;height:3px;border-radius:2px;background:var(--line);overflow:hidden}
+.seg .bar2 i{
+  display:block;height:100%;background:var(--gold);transform-origin:left center;transform:scaleX(0);
+  transition:transform .6s cubic-bezier(.22,.8,.2,1);
+}
+.seg .num{display:block;margin-top:8px;transition:color .3s}
+.seg[aria-current="true"] .num{color:var(--gold)}
+.seg:hover .num{color:var(--ink)}
+.seg:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+
+.info{min-width:0}
+.kind{margin:0 0 14px;font:600 12px var(--body);letter-spacing:.18em;text-transform:uppercase;color:var(--gold)}
+.info h3{margin:0;font:500 clamp(36px,5vw,58px)/1 var(--display);text-wrap:balance}
+.body{max-width:56ch;margin:20px 0 0;font-size:17px;line-height:1.72;color:rgba(237,240,250,.9)}
+.detail{margin-top:24px;padding-top:16px;border-top:1px solid var(--line);max-width:56ch}
+.detail span{display:block;font:600 11px var(--body);letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.detail p{margin:8px 0 0;font-size:15px;line-height:1.65;color:var(--muted)}
+.map{margin:28px 0 0}
+.map svg{display:block;width:100%;height:auto;max-width:420px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.025)}
+.map figcaption{margin-top:8px;font-size:12px;color:var(--muted)}
+.m-grid{stroke:rgba(237,240,250,.06);stroke-width:1}
+.m-route{fill:none;stroke:rgba(230,194,123,.4);stroke-width:1.4;stroke-dasharray:3 5;stroke-linejoin:round}
+.m-dot{cursor:pointer}
+.m-dot circle{fill:var(--panel);stroke:rgba(237,240,250,.42);stroke-width:1.2;transition:fill .4s,stroke .4s}
+.m-dot.on circle{fill:var(--gold);stroke:var(--gold)}
+.m-num{font:600 10px var(--body);fill:var(--muted);text-anchor:middle;dominant-baseline:central;pointer-events:none}
+.m-dot.on .m-num{fill:var(--bg)}
+.ringg{transition:transform .8s cubic-bezier(.22,.8,.2,1);pointer-events:none}
+.ring{fill:none;stroke:var(--gold);stroke-width:1.5;transform-box:fill-box;transform-origin:center;animation:ping 2.2s ease-out infinite}
+@keyframes ping{0%{transform:scale(1);opacity:.7}100%{transform:scale(2.8);opacity:0}}
+.m-label{font:600 12px var(--body);fill:var(--ink);paint-order:stroke;stroke:var(--panel);stroke-width:4px;stroke-linejoin:round;pointer-events:none}
+
+footer{padding-block:28px 48px;border-top:1px solid var(--line)}
+footer p{margin:0;max-width:78ch;font-size:13px;line-height:1.7;color:var(--muted)}
+
+@media (max-width:900px){
+  .tour-grid{grid-template-columns:minmax(0,1fr)}
+  .rib{height:110px}
+  .rib img{width:165px}
+}
+@media (max-width:520px){
+  .cta .btn{flex:1 1 100%}
+  .frame-bottom{padding:14px}
+  .btn{padding:0 18px}
+}
+@media (prefers-reduced-motion:reduce){
+  .btn .reel,.rib .track,.layer img,.ring{animation:none!important}
+  html{scroll-behavior:auto}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap bar">
+    <span class="brand">Петербург онлайн</span>
+    <span class="coord">59°57′ с. ш. · 30°19′ в. д.</span>
+  </div>
+</header>
+
+<main>
+<section class="hero">
+  <div class="wrap">
+    <p class="eyebrow">Онлайн-экскурсия · 8 остановок</p>
+    <h1>Прогулка<br>по <em>Петербургу</em></h1>
+    <p class="lead">От Адмиралтейства до Медного всадника: площади, мосты, соборы и главная улица города. Листайте остановки сами или включите автопрогулку.</p>
+    <div class="cta">
+      <button class="btn" id="startBtn" type="button" data-dir="left">
+        <span class="label">Начать экскурсию
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9h12M10 4l5 5-5 5"/></svg>
+        </span>
+      </button>
+      <button class="btn" id="autoBtn" type="button" data-dir="right">
+        <span class="label">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M4 2.5v11l9-5.5z"/></svg>
+          Включить автопрогулку
+        </span>
+      </button>
+    </div>
+    <dl class="facts">
+      <div><dt>Основан</dt><dd>27 мая 1703</dd></div>
+      <div><dt>Остановок</dt><dd>8</dd></div>
+      <div><dt>Автопрогулка</dt><dd>около полутора минут</dd></div>
+    </dl>
+  </div>
+  <div class="ribbons" aria-hidden="true">
+    <div class="rib l" id="ribL"></div>
+    <div class="rib r" id="ribR"></div>
+  </div>
+</section>
+
+<section class="tour" id="tour">
+  <div class="wrap">
+    <div class="tour-head">
+      <h2>Маршрут</h2>
+      <p>Переключайте остановки кнопками, стрелками на клавиатуре или свайпом по кадру.</p>
+    </div>
+    <div class="tour-grid">
+      <div class="stage-col">
+        <div class="frame" id="frame">
+          <div class="layers" id="layers"></div>
+          <div class="frame-top"><span class="chip" id="counter">01 / 08</span></div>
+          <div class="frame-bottom">
+            <span class="coords" id="coords"></span>
+            <div class="year"><b id="year"></b><span id="yearLabel"></span></div>
+          </div>
+        </div>
+        <div class="controls">
+          <button class="btn" id="prev" type="button" data-dir="right">
+            <span class="label">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 9H3M8 4L3 9l5 5"/></svg>
+              Назад
+            </span>
+          </button>
+          <button class="btn" id="next" type="button" data-dir="left">
+            <span class="label">Вперёд
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9h12M10 4l5 5-5 5"/></svg>
+            </span>
+          </button>
+          <button class="btn" id="play" type="button" data-dir="right" aria-pressed="false">
+            <span class="label">
+              <svg id="playIcon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M4 2.5v11l9-5.5z"/></svg>
+              <span id="playText">Автопрогулка</span>
+            </span>
+          </button>
+        </div>
+        <div class="timeline" id="timeline"></div>
+      </div>
+      <article class="info" id="info" aria-live="polite">
+        <p class="kind" id="kind"></p>
+        <h3 id="title"></h3>
+        <p class="body" id="body"></p>
+        <div class="detail" id="detailBox"><span>Обратите внимание</span><p id="detail"></p></div>
+        <figure class="map" id="mapBox">
+          <svg id="map" viewBox="0 0 320 250" role="img" aria-label="Схема расположения восьми остановок"></svg>
+          <figcaption>Схема расположения остановок по их координатам</figcaption>
+        </figure>
+      </article>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>Иллюстрации нарисованы для этой страницы, это не фотографии. Расписание разводки мостов, часы работы музеев и храмов проверяйте перед прогулкой на официальных сайтах.</p>
+  </div>
+</footer>
+
+<script>
+/* ===== Иллюстрации и данные остановок ===== */
+(function(){
+  var W=1200,H=800;
+  function rng(seed){var s=seed>>>0;return function(){s=(s*1664525+1013904223)>>>0;return s/4294967296;};}
+  var R=function(x,y,w,h,f,e){return '<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" fill="'+f+'" '+(e||'')+'/>';};
+  var P=function(p,f,e){return '<polygon points="'+p+'" fill="'+f+'" '+(e||'')+'/>';};
+  var D=function(d,f,e){return '<path d="'+d+'" fill="'+f+'" '+(e||'')+'/>';};
+  var C=function(x,y,r,f,e){return '<circle cx="'+x+'" cy="'+y+'" r="'+r+'" fill="'+f+'" '+(e||'')+'/>';};
+  var T=function(x1,y1,x2,y2,s,w,e){return '<line x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'" stroke="'+s+'" stroke-width="'+w+'" stroke-linecap="round" '+(e||'')+'/>';};
+  function onion(cx,y0,w,h,f){
+    return D('M'+cx+' '+y0+'C'+(cx+.15*w)+' '+(y0+.2*h)+' '+(cx+.6*w)+' '+(y0+.35*h)+' '+(cx+.5*w)+' '+(y0+.72*h)+
+      'Q'+(cx+.45*w)+' '+(y0+h)+' '+cx+' '+(y0+h)+'Q'+(cx-.45*w)+' '+(y0+h)+' '+(cx-.5*w)+' '+(y0+.72*h)+
+      'C'+(cx-.6*w)+' '+(y0+.35*h)+' '+(cx-.15*w)+' '+(y0+.2*h)+' '+cx+' '+y0+'Z',f);
+  }
+  function skyline(r,hz,base,amp,fill,op){
+    var d='M0 '+hz,x=0;
+    while(x<W){var w=24+r()*60,h=base+r()*amp;d+=' L'+x+' '+(hz-h)+' L'+(x+w)+' '+(hz-h);x+=w;}
+    return '<path d="'+d+' L'+W+' '+hz+' Z" fill="'+fill+'" opacity="'+op+'"/>';
+  }
+
+  /* --- силуэты --- */
+  function admiralty(c,c2,hz,r){
+    var g='#e8c36f',s='',x;
+    s+=R(150,472,900,88,c)+R(150,462,900,10,c2);
+    for(x=170;x<1030;x+=18){if(x>520&&x<680)continue;s+=R(x,490,7,18,'rgba(255,214,140,.55)')+R(x,524,7,18,'rgba(255,214,140,.4)');}
+    [[300,70],[830,70]].forEach(function(a){s+=R(a[0],430,a[1],130,c2)+P((a[0]-6)+',430 '+(a[0]+a[1]+6)+',430 '+(a[0]+a[1]/2)+',396',c);});
+    s+=R(540,392,120,168,c2)+P('530,392 670,392 600,360',c);
+    s+=D('M578 560V470A22 22 0 0 1 622 470V560Z','#0a0f22');
+    s+=R(560,300,80,60,c2)+R(572,250,56,50,c)+R(580,205,40,45,c2);
+    s+=R(556,296,88,6,g)+R(568,246,64,5,g);
+    s+=P('600,70 590,205 610,205',g)+C(600,150,5,g);
+    s+=D('M588 78q12 9 24 0l-4 7h-16z',g)+P('600,52 600,76 614,76',g);
+    return s;
+  }
+  function palace(c,c2,hz,r){
+    var g='#e8c36f',s=R(40,468,1120,92,c)+R(40,458,1120,10,c2),x,a;
+    for(x=50;x<1150;x+=20)s+=R(x,444+(r()*6|0),5,14,c2);
+    for(x=58;x<1150;x+=22){a=r()<.78?'rgba(255,208,130,.6)':'rgba(150,170,220,.15)';s+=R(x,484,9,18,a)+R(x,516,9,20,a);}
+    s+=R(500,440,200,120,c2)+P('490,440 710,440 600,402',c);
+    s+=R(826,512,28,48,c2)+P('831,512 849,512 846,236 834,236',c2,'stroke="rgba(255,255,255,.16)" stroke-width="1"')+R(822,224,36,13,c2)+C(840,214,8,c2)+T(840,206,840,168,g,3)+T(831,180,849,180,g,3);
+    return s;
+  }
+  function bridge(c,c2,hz,r){
+    var g='#ffd98a',dk=516,m=function(x){return 1200-x;},s='',i,x;
+    s+=P('930,250 924,500 936,500',c2,'opacity=".8"')+R(916,470,28,40,c2,'opacity=".8"');
+    s+=R(80,dk,370,14,c)+R(750,dk,370,14,c);
+    var piers=[110,200,290,380,434];
+    piers.forEach(function(px){s+=R(px,dk,16,hz-dk,c)+R(m(px)-16,dk,16,hz-dk,c);});
+    for(i=0;i<piers.length-1;i++){
+      var a=piers[i]+16,b=piers[i+1],md=(a+b)/2;
+      s+=D('M'+a+' '+(dk+14)+'Q'+md+' '+(dk+46)+' '+b+' '+(dk+14),'none','stroke="'+c+'" stroke-width="7"');
+      s+=D('M'+m(a)+' '+(dk+14)+'Q'+m(md)+' '+(dk+46)+' '+m(b)+' '+(dk+14),'none','stroke="'+c+'" stroke-width="7"');
+    }
+    s+=P('432,516 470,516 556,284 540,276',c)+P('768,516 730,516 644,284 660,276',c)+R(426,498,52,18,c2)+R(722,498,52,18,c2);
+    for(x=100;x<440;x+=44){[x,m(x)].forEach(function(px){s+=T(px,dk,px,dk-34,c,3)+C(px,dk-38,5,g)+C(px,dk-38,18,g,'opacity=".18"');});}
+    return s;
+  }
+  function ppf(c,c2,hz,r){
+    var g='#e8c36f',s='',x;
+    s+=R(40,500,1120,60,c)+P('130,560 178,486 345,486 396,560',c2)+P('830,560 870,486 1040,486 1100,560',c2);
+    for(x=40;x<1160;x+=16)s+=R(x,493,8,8,c);
+    s+=R(470,420,180,82,c2)+P('462,420 658,420 560,396',c);
+    s+=D('M488 412C488 382 528 382 528 412Z',g)+T(508,384,508,372,g,2);
+    for(x=480;x<640;x+=22)s+=R(x,446,8,22,'rgba(255,208,130,.5)');
+    s+=R(540,328,60,94,c2)+R(550,278,40,52,c)+R(558,236,24,42,c2)+R(536,324,68,6,g)+R(546,274,48,5,g)+R(555,232,30,4,g);
+    s+=P('570,36 558,232 582,232',g)+C(570,112,4.5,g)+T(570,36,570,16,g,2.4)+T(562,26,578,26,g,2.4);
+    return s;
+  }
+  function savior(c,c2,hz,r){
+    var g='#e3b85c',tl='#2a9d8f',rd='#c1555c',bl='#4a78c8',gr='#4aa56b',s='',x;
+    function sd(cx,by,tw,th,col){
+      return R(cx-tw/2,by,tw,420-by,c)+onion(cx,by-th,tw*1.15,th,col)+T(cx,by-th,cx,by-th-16,g,2.5)+T(cx-5,by-th-9,cx+5,by-th-9,g,2.5);
+    }
+    s+=R(300,420,600,140,c2);
+    for(x=300;x<900;x+=40)s+=D('M'+x+' 420A20 20 0 0 1 '+(x+40)+' 420Z',c);
+    for(x=322;x<880;x+=40)s+=R(x,462,12,30,'rgba(255,208,130,.5)')+D('M'+x+' 462A6 6 0 0 1 '+(x+12)+' 462Z','rgba(255,208,130,.5)');
+    s+=R(570,300,60,120,c)+P('558,300 642,300 600,168',tl)+T(600,168,578,300,'rgba(255,255,255,.22)',1.5)+T(600,168,622,300,'rgba(255,255,255,.22)',1.5);
+    s+=onion(600,92,46,76,g)+T(600,92,600,72,g,3)+T(592,82,608,82,g,3);
+    s+=sd(450,330,46,80,bl)+sd(750,330,46,80,gr)+sd(375,368,34,58,rd)+sd(825,368,34,58,g)+sd(325,392,26,44,tl)+sd(875,392,26,44,bl);
+    return s;
+  }
+  function isaac(c,c2,hz,r){
+    var g='#e8c36f',s='',x;
+    s+=R(240,474,720,86,c2)+R(240,466,720,10,c);
+    s+=R(330,432,540,36,c2)+P('318,434 882,434 600,386',c);
+    for(x=344;x<860;x+=24)s+=R(x,474,8,86,'rgba(255,255,255,.1)');
+    s+=R(480,300,240,92,c2)+R(468,292,264,10,c);
+    for(x=492;x<712;x+=22)s+=R(x,304,7,86,'rgba(255,255,255,.1)');
+    s+=D('M488 292C488 168 712 168 712 292Z',g)+D('M600 200C660 200 712 236 712 292L600 292Z','rgba(0,0,0,.22)');
+    s+=R(586,160,28,46,c2)+D('M584 162C584 138 616 138 616 162Z',g)+T(600,140,600,114,g,3)+T(591,126,609,126,g,3);
+    [392,808].forEach(function(px){s+=R(px-20,384,40,56,c2)+D('M'+(px-24)+' 384C'+(px-24)+' 344 '+(px+24)+' 344 '+(px+24)+' 384Z',g);});
+    return s;
+  }
+  function nevsky(c,c2,hz,r){
+    var g='#e8c36f',s='',k,t,i;
+    s+=R(0,470,1200,330,'#0b1129')+P('560,470 640,470 1200,800 0,800','#0e1530');
+    s+='<ellipse cx="600" cy="520" rx="170" ry="40" fill="#ffe3b0" opacity=".16"/>';
+    s+=R(540,418,120,52,c2)+R(588,374,24,46,c2)+P('600,232 595,374 605,374',g)+C(600,300,3,g)+R(582,370,36,5,g);
+    s+=P('0,90 545,330 545,470 0,800',c2)+P('1200,90 655,330 655,470 1200,800',c);
+    var top=function(x){return 90+240*x/545;},bot=function(x){return 800-330*x/545;};
+    for(k=0;k<16;k++){
+      var x1=545*(1-Math.pow(.8,k)),x2=545*(1-Math.pow(.8,k+1)),w=x2-x1,a=x1+w*.22,b=x2-w*.22;
+      [[.14,.27,0],[.38,.51,0],[.62,.75,0],[.84,.93,1]].forEach(function(row){
+        ['L','R'].forEach(function(side){
+          var pt=function(x,f){var y=top(x)+f*(bot(x)-top(x));return (side==='L'?x:1200-x).toFixed(1)+','+y.toFixed(1);};
+          var lit=r()<.62;
+          var col=row[2]?'rgba(255,200,120,.75)':(lit?'rgba(255,214,140,.7)':'rgba(150,170,220,.16)');
+          s+=P(pt(a,row[0])+' '+pt(b,row[0])+' '+pt(b,row[1])+' '+pt(a,row[1]),col);
+        });
+      });
+    }
+    for(i=0;i<9;i++){
+      var y0=474+330*Math.pow(i/9,1.7),y1=474+330*Math.pow((i+.5)/9,1.7),w0=1+(y0-470)/330*9,w1=1+(y1-470)/330*9;
+      s+=P((600-w0/2)+','+y0+' '+(600+w0/2)+','+y0+' '+(600+w1/2)+','+y1+' '+(600-w1/2)+','+y1,'rgba(255,230,180,.55)');
+    }
+    [.12,.3,.46,.6,.72,.82,.9].forEach(function(tt){
+      var bx=555*tt,by=800-328*tt,h=230*(1-tt),hr=3+9*(1-tt),gr=10+34*(1-tt);
+      [bx,1200-bx].forEach(function(px){
+        s+=T(px,by,px,by-h,'#05091a',2+5*(1-tt))+C(px,by-h,gr,g,'opacity=".2"')+C(px,by-h,hr,g);
+      });
+    });
+    return s;
+  }
+  function medny(c,c2,hz,r){
+    var g='#e8c36f',s='';
+    s+=P('1000,320 994,500 1006,500',g,'opacity=".55"')+R(988,470,24,30,c2,'opacity=".6"');
+    s+=D('M330 560L400 520L470 490L520 470L560 440L610 428L690 426L740 440L800 480L870 520L930 560Z',c2);
+    s+=D('M470 490L520 470L548 500L500 520Z','rgba(255,255,255,.06)')+D('M610 428L690 426L710 470L640 480Z','rgba(255,255,255,.05)');
+    s+='<ellipse cx="640" cy="385" rx="52" ry="24" transform="rotate(-28 640 385)" fill="'+c+'"/>';
+    s+=P('672,372 690,318 716,296 732,306 716,332 704,380',c);
+    s+='<ellipse cx="734" cy="300" rx="19" ry="9" transform="rotate(35 734 300)" fill="'+c+'"/>';
+    s+=T(684,380,722,360,c,9)+T(722,360,744,338,c,8)+T(690,388,722,392,c,9)+T(722,392,748,366,c,8);
+    s+=T(605,402,592,428,c,10)+T(626,406,634,428,c,10);
+    s+=D('M594 372Q552 392 560 428','none','stroke="'+c+'" stroke-width="6" stroke-linecap="round"');
+    s+=P('646,360 654,306 674,304 676,356',c)+C(664,294,10,c)+T(672,314,722,278,c,7)+C(724,276,5,c)+P('652,312 610,326 606,372 646,356',c);
+    return s;
+  }
+
+  /* --- сборка сцены --- */
+  function build(sc){
+    var r=rng(sc.seed),hz=sc.hz||560,nw=!!sc.noWater,sun=sc.sun,col=sun?sun.color:'#fff',i,s,defs;
+    defs='<linearGradient id="sk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="'+sc.top+'"/><stop offset=".6" stop-color="'+sc.mid+'"/><stop offset="1" stop-color="'+sc.low+'"/></linearGradient>'+
+      '<radialGradient id="gl"><stop offset="0" stop-color="'+col+'" stop-opacity=".8"/><stop offset="1" stop-color="'+col+'" stop-opacity="0"/></radialGradient>';
+    if(!nw)defs+='<linearGradient id="wt" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="'+sc.water[0]+'"/><stop offset="1" stop-color="'+sc.water[1]+'"/></linearGradient>'+
+      '<filter id="bl" x="-5%" y="-5%" width="110%" height="110%"><feGaussianBlur stdDeviation="2 7"/></filter>'+
+      '<clipPath id="cw"><rect y="'+hz+'" width="'+W+'" height="'+(H-hz)+'"/></clipPath>';
+    s='<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice"><defs>'+defs+'</defs>';
+    s+='<rect width="1200" height="'+hz+'" fill="url(#sk)"/>';
+    if(sc.stars){for(i=0;i<70;i++)s+=C((r()*1200).toFixed(0),(r()*hz*.62).toFixed(0),(.6+r()*.9).toFixed(1),'#eaf0ff','opacity="'+(.35+r()*.55).toFixed(2)+'"');}
+    if(sun)s+=C(sun.x,sun.y,340,'url(#gl)')+C(sun.x,sun.y,sun.r,col);
+    for(i=0;i<(sc.clouds||5);i++){
+      var cx=r()*1200,cy=50+r()*hz*.45,rx=140+r()*200,ry=8+r()*14;
+      s+='<ellipse cx="'+cx.toFixed(0)+'" cy="'+cy.toFixed(0)+'" rx="'+rx.toFixed(0)+'" ry="'+ry.toFixed(0)+'" fill="'+(sc.cloud||'#ffd9c0')+'" opacity=".2"/>'+
+         '<ellipse cx="'+(cx+rx*.3).toFixed(0)+'" cy="'+(cy-ry*.9).toFixed(0)+'" rx="'+(rx*.6).toFixed(0)+'" ry="'+(ry*.8).toFixed(0)+'" fill="'+(sc.cloud||'#ffd9c0')+'" opacity=".16"/>';
+    }
+    if(!sc.stars){for(i=0;i<4;i++){var bx=100+r()*1000,by=90+r()*190;s+='<path d="M'+bx.toFixed(0)+' '+by.toFixed(0)+'q7 -7 14 0q7 -7 14 0" fill="none" stroke="'+sc.c+'" stroke-width="1.8" opacity=".5"/>';}}
+    var back=nw?'':skyline(r,hz,40,70,sc.c2,.55)+skyline(r,hz,20,45,sc.c,.9);
+    var L=sc.draw(sc.c,sc.c2,hz,r,sc);
+    s+=back+L;
+    if(!nw){
+      s+='<rect y="'+hz+'" width="'+W+'" height="'+(H-hz)+'" fill="url(#wt)"/>';
+      s+='<g clip-path="url(#cw)"><g transform="translate(0 '+(2*hz)+') scale(1 -1)" opacity=".32" filter="url(#bl)">'+back+L+'</g></g>';
+      if(sun&&sun.y>hz-120){for(i=0;i<14;i++){var w=(30+i*10)*(.6+r()*.8);s+='<rect x="'+(sun.x-w/2).toFixed(0)+'" y="'+(hz+6+i*15)+'" width="'+w.toFixed(0)+'" height="3" rx="1.5" fill="'+col+'" opacity="'+Math.max(.05,.4-i*.025).toFixed(2)+'"/>';}}
+      for(i=0;i<26;i++){
+        var y=hz+8+Math.pow(i/26,1.6)*(H-hz-14),rw=40+r()*180*(.5+i/26);
+        s+='<rect x="'+(r()*1100).toFixed(0)+'" y="'+y.toFixed(0)+'" width="'+rw.toFixed(0)+'" height="'+(1.2+i/20).toFixed(1)+'" rx="1" fill="'+(sc.ripple||col)+'" opacity="'+(.1+r()*.2).toFixed(2)+'"/>';
+      }
+    }
+    return s+'</svg>';
+  }
+
+  var stops=[
+    {name:'Адмиралтейство',kind:'Символ города',lat:59.9372,lon:30.3085,year:'1823',yearLabel:'здание завершено',
+     body:'Золотой шпиль с корабликом виден с набережных и из многих улиц центра, поэтому по нему легко ориентироваться. Верфь здесь основана в 1704 году, а нынешнее здание архитектор Андреян Захаров завершил в 1823 году.',
+     detail:'Три главные улицы центра, Невский проспект, Гороховая улица и Вознесенский проспект, расходятся лучами от Адмиралтейства.',
+     scene:{seed:11,top:'#1b2a52',mid:'#7f74ab',low:'#f3b98b',c:'#101830',c2:'#1b2547',water:['#e3a98f','#1a2347'],ripple:'#ffe0b8',sun:{x:850,y:500,r:36,color:'#ffe2b0'},draw:admiralty}},
+    {name:'Дворцовая площадь',kind:'Главная площадь',lat:59.9393,lon:30.3158,year:'1762',yearLabel:'дворец построен',
+     body:'Площадь окружают Зимний дворец, здание Главного штаба и Александровская колонна в центре. Дворец построил Бартоломео Растрелли в 1754–1762 годах. Сегодня он входит в Эрмитаж, где хранится около трёх миллионов предметов.',
+     detail:'Александровская колонна высотой около 47 метров ничем не закреплена: её удерживает собственный вес, около 600 тонн.',
+     scene:{seed:22,top:'#1a1f45',mid:'#8b5f90',low:'#f2a38b',c:'#12142f',c2:'#1f2147',water:['#e69a8e','#1a1c3c'],ripple:'#ffd2a8',sun:{x:260,y:520,r:30,color:'#ffd2a8'},draw:palace}},
+    {name:'Дворцовый мост',kind:'Разводной мост',lat:59.9411,lon:30.3086,year:'1916',yearLabel:'мост открыт',
+     body:'Мост соединяет центр города со Стрелкой Васильевского острова и открыт в 1916 году. Ночью его разводят, и ради этого зрелища на набережные выходят и местные жители, и гости.',
+     detail:'Мосты разводят в навигацию, обычно с весны до поздней осени. Расписание лучше проверить заранее.',
+     scene:{seed:33,top:'#0a1130',mid:'#1f3b6e',low:'#6aa3b5',c:'#070c20',c2:'#0f1a3a',water:['#5f93aa','#0a1230'],ripple:'#ffd98a',sun:{x:250,y:160,r:22,color:'#dfe8ff'},stars:true,cloud:'#8fb0ff',clouds:3,draw:bridge}},
+    {name:'Петропавловская крепость',kind:'С чего всё началось',lat:59.95,lon:30.3167,year:'1703',yearLabel:'крепость заложена',
+     body:'Крепость заложена 27 мая 1703 года на Заячьем острове, и с этой даты принято отсчитывать историю города. Колокольня Петропавловского собора поднимается примерно на 122 метра и остаётся одной из самых высоких построек исторического центра.',
+     detail:'Каждый день в полдень с Нарышкина бастиона стреляет пушка.',
+     scene:{seed:44,top:'#22305c',mid:'#d3866f',low:'#ffd89c',c:'#141a36',c2:'#232b4f',water:['#f0be93','#1d2548'],ripple:'#fff0c9',sun:{x:260,y:515,r:42,color:'#fff0c9'},draw:ppf}},
+    {name:'Храм Спаса на Крови',kind:'Храм-памятник',lat:59.9401,lon:30.3286,year:'1907',yearLabel:'храм освящён',
+     body:'Храм построен в 1883–1907 годах на месте, где в 1881 году смертельно ранили императора Александра II. Пёстрые купола и кокошники напоминают русские церкви XVII века, поэтому храм заметно выделяется среди петербургской классики.',
+     detail:'Мозаики внутри занимают более 7000 квадратных метров. Эскизы для них рисовали известные художники, среди них Виктор Васнецов и Михаил Нестеров.',
+     scene:{seed:55,top:'#2b2459',mid:'#b4638f',low:'#ffc49d',c:'#171634',c2:'#27244d',water:['#eba79a','#221f45'],ripple:'#ffe0bb',sun:{x:980,y:520,r:28,color:'#ffe0bb'},draw:savior}},
+    {name:'Невский проспект',kind:'Главная улица',lat:59.9358,lon:30.3256,year:'1710',yearLabel:'улица проложена',
+     body:'Невский проспект начинается у Адмиралтейства и тянется примерно на 4,5 километра до Александро-Невской лавры. Улица проложена в 1710 году и с тех пор остаётся главной в городе: на ней соседствуют соборы, книжные магазины, кафе и мосты.',
+     detail:'По пути вы увидите Казанский собор, Дом Зингера со стеклянным глобусом на башне и Аничков мост с конными скульптурами Клодта.',
+     scene:{seed:66,hz:470,noWater:true,top:'#2b4b7e',mid:'#90b1d1',low:'#f6d5a6',c:'#141c3a',c2:'#202a50',sun:{x:600,y:440,r:30,color:'#fff0cf'},cloud:'#fff0dd',draw:nevsky}},
+    {name:'Исаакиевский собор',kind:'Собор и смотровая',lat:59.9341,lon:30.3061,year:'1858',yearLabel:'собор освящён',
+     body:'Собор строили сорок лет, с 1818 по 1858 год, по проекту Огюста Монферрана. Позолоченный купол поднимается примерно на 100 метров и виден издалека, это одна из главных вертикалей города.',
+     detail:'Смотровая площадка на колоннаде находится примерно на высоте 43 метров. Оттуда видны крыши центра, Адмиралтейство и Нева.',
+     scene:{seed:77,top:'#1d2c58',mid:'#6179b6',low:'#f7caa2',c:'#111833',c2:'#1c2546',water:['#e9b99f','#1b2347'],ripple:'#ffe6c2',sun:{x:1000,y:515,r:34,color:'#ffe6c2'},cloud:'#ffe2d0',draw:isaac}},
+    {name:'Медный всадник',kind:'Памятник Петру I',lat:59.9363,lon:30.3025,year:'1782',yearLabel:'памятник открыт',
+     body:'Памятник Петру I работы Этьена Мориса Фальконе открыт на Сенатской площади в 1782 году. Всадник на вздыбленном коне указывает рукой на Неву.',
+     detail:'Постамент сделан из Гром-камня, огромной гранитной глыбы, которую привезли к Неве в 1770 году. Название «Медный всадник» закрепила поэма Пушкина 1833 года, хотя сам памятник отлит из бронзы.',
+     scene:{seed:88,top:'#1b2142',mid:'#55527f',low:'#e7a880',c:'#10152e',c2:'#262c52',water:['#d9987f','#1c2145'],ripple:'#ffd9b0',sun:{x:200,y:520,r:30,color:'#ffd9b0'},clouds:8,cloud:'#f0b9a0',draw:medny}}
+  ];
+  window.PB={stops:stops,build:build};
+})();
+</script>
+
+<script>
+/* ===== Экскурсия ===== */
+(function(){
+  var stops=window.PB.stops,n=stops.length;
+  var $=function(s){return document.querySelector(s);};
+  var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var DUR=11000,PLAY='<path d="M4 2.5v11l9-5.5z"/>',PAUSE='<path d="M4 2.5h3v11H4zM9 2.5h3v11H9z"/>';
+  var cur=0,auto=false,fillAnim=null,segs=[],dots=[],pts=[];
+
+  function raster(url,w,h,q){
+    return new Promise(function(res){
+      var im=new Image();
+      im.onload=function(){
+        try{var cv=document.createElement('canvas');cv.width=w;cv.height=h;cv.getContext('2d').drawImage(im,0,0,w,h);res(cv.toDataURL('image/jpeg',q));}
+        catch(e){res(url);}
+      };
+      im.onerror=function(){res(url);};
+      im.src=url;
+    });
+  }
+  function imgEl(src,alt){var i=new Image();i.alt=alt||'';i.decoding='async';i.src=src;i.draggable=false;return i;}
+  function fillStrip(el,offset){
+    var order=stops.map(function(_,i){return stops[(i+offset)%n].thumb;});
+    order.concat(order).forEach(function(src){el.appendChild(imgEl(src));});
+  }
+  var fmt=function(x){return x.toFixed(3).replace('.',',');};
+  var pad2=function(x){return (x<10?'0':'')+x;};
+
+  Promise.all(stops.map(function(s){
+    s.svg='data:image/svg+xml;utf8,'+encodeURIComponent(window.PB.build(s.scene));
+    return Promise.all([raster(s.svg,1200,800,.9),raster(s.svg,420,280,.86)]).then(function(r){s.big=r[0];s.thumb=r[1];});
+  })).then(start);
+
+  function start(){
+    /* ленты в кнопках */
+    document.querySelectorAll('.btn').forEach(function(b,i){
+      var reel=document.createElement('span');reel.className='reel';reel.setAttribute('aria-hidden','true');
+      fillStrip(reel,i*3);
+      reel.style.animationDuration=(34+i*4)+'s';
+      reel.style.animationDelay='-'+(i*9)+'s';
+      b.insertBefore(reel,b.firstChild);
+    });
+    /* ленты на первом экране */
+    [['#ribL',0],['#ribR',4]].forEach(function(a){
+      var t=document.createElement('div');t.className='track';fillStrip(t,a[1]);$(a[0]).appendChild(t);
+    });
+
+    buildTimeline();buildMap();
+    go(0,1);
+
+    $('#next').onclick=function(){go(cur+1,1);};
+    $('#prev').onclick=function(){go(cur-1,-1);};
+    $('#play').onclick=function(){if(auto)setAuto(false);else{if(cur===n-1)go(0,-1);setAuto(true);}};
+    var toTour=function(){$('#tour').scrollIntoView({behavior:reduce?'auto':'smooth',block:'start'});};
+    $('#startBtn').onclick=function(){toTour();};
+    $('#autoBtn').onclick=function(){toTour();if(cur===n-1)go(0,-1);setAuto(true);};
+
+    var sx=null,fr=$('#frame');
+    fr.addEventListener('pointerdown',function(e){sx=e.clientX;});
+    fr.addEventListener('pointerup',function(e){
+      if(sx===null)return;var dx=e.clientX-sx;sx=null;
+      if(Math.abs(dx)>50)go(cur+(dx<0?1:-1),dx<0?1:-1);
+    });
+    fr.addEventListener('pointercancel',function(){sx=null;});
+    document.addEventListener('keydown',function(e){
+      if(e.target&&e.target.matches&&e.target.matches('input,textarea,select'))return;
+      if(e.key==='ArrowRight')go(cur+1,1);else if(e.key==='ArrowLeft')go(cur-1,-1);
+    });
+    document.addEventListener('visibilitychange',function(){
+      if(!fillAnim)return;if(document.hidden)fillAnim.pause();else fillAnim.play();
+    });
+  }
+
+  function buildTimeline(){
+    var tl=$('#timeline');
+    stops.forEach(function(s,i){
+      var b=document.createElement('button');
+      b.type='button';b.className='seg';b.title=s.name;
+      b.setAttribute('aria-label','Остановка '+(i+1)+': '+s.name);
+      b.innerHTML='<span class="bar2"><i></i></span><span class="num">'+pad2(i+1)+'</span>';
+      b.addEventListener('click',function(){go(i);});
+      tl.appendChild(b);
+      segs.push({el:b,bar:b.querySelector('i')});
+    });
+  }
+
+  function buildMap(){
+    var MW=320,MH=250,pd=28,kx=55.8,ky=111.2;
+    var lats=stops.map(function(s){return s.lat;}),lons=stops.map(function(s){return s.lon;});
+    var minLat=Math.min.apply(null,lats),maxLat=Math.max.apply(null,lats),minLon=Math.min.apply(null,lons),maxLon=Math.max.apply(null,lons);
+    var xs=(maxLon-minLon)*kx,ys=(maxLat-minLat)*ky;
+    var sc=Math.min((MW-2*pd)/xs,(MH-2*pd)/ys),ox=(MW-xs*sc)/2,oy=(MH-ys*sc)/2;
+    pts=stops.map(function(s){return {x:ox+(s.lon-minLon)*kx*sc,y:oy+(maxLat-s.lat)*ky*sc};});
+    var h='',i;
+    for(i=40;i<MW;i+=40)h+='<line class="m-grid" x1="'+i+'" y1="0" x2="'+i+'" y2="'+MH+'"/>';
+    for(i=40;i<MH;i+=40)h+='<line class="m-grid" x1="0" y1="'+i+'" x2="'+MW+'" y2="'+i+'"/>';
+    h+='<polyline class="m-route" points="'+pts.map(function(p){return p.x.toFixed(1)+','+p.y.toFixed(1);}).join(' ')+'"/>';
+    h+='<g class="ringg" id="ringG"><circle class="ring" r="9" cx="0" cy="0"/></g>';
+    pts.forEach(function(p,k){
+      h+='<g class="m-dot" data-i="'+k+'"><circle cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="8"/><text class="m-num" x="'+p.x.toFixed(1)+'" y="'+p.y.toFixed(1)+'">'+(k+1)+'</text></g>';
+    });
+    h+='<text class="m-label" id="mapLabel" x="0" y="0"></text>';
+    var svg=$('#map');svg.innerHTML=h;
+    dots=[].slice.call(svg.querySelectorAll('.m-dot'));
+    dots.forEach(function(g,k){g.addEventListener('click',function(){go(k);});});
+  }
+
+  function updateMap(){
+    var p=pts[cur];
+    dots.forEach(function(g,k){g.classList.toggle('on',k===cur);});
+    $('#ringG').style.transform='translate('+p.x.toFixed(1)+'px,'+p.y.toFixed(1)+'px)';
+    var lb=$('#mapLabel'),left=p.x>160;
+    lb.textContent=stops[cur].name;
+    lb.setAttribute('text-anchor',left?'end':'start');
+    lb.setAttribute('x',(left?p.x-14:p.x+14).toFixed(1));
+    lb.setAttribute('y',(p.y+4).toFixed(1));
+  }
+
+  function paintTimeline(){
+    segs.forEach(function(sg,i){
+      sg.el.setAttribute('aria-current',i===cur?'true':'false');
+      if(i===cur&&auto)return;
+      sg.bar.style.transform=i<=cur?'scaleX(1)':'scaleX(0)';
+    });
+  }
+  function stopFill(){if(fillAnim){fillAnim.cancel();fillAnim=null;}}
+  function startFill(){
+    stopFill();
+    var bar=segs[cur].bar;bar.style.transform='scaleX(0)';
+    fillAnim=bar.animate([{transform:'scaleX(0)'},{transform:'scaleX(1)'}],{duration:DUR,easing:'linear',fill:'forwards'});
+    fillAnim.onfinish=function(){
+      if(!auto)return;
+      if(cur===n-1)setAuto(false);else go(cur+1,1);
+    };
+  }
+  function setAuto(v){
+    auto=v;
+    $('#playText').textContent=v?'Пауза':'Автопрогулка';
+    $('#playIcon').innerHTML=v?PAUSE:PLAY;
+    $('#play').setAttribute('aria-pressed',String(v));
+    if(v)startFill();else{stopFill();paintTimeline();}
+  }
+
+  function swapText(el,text,delay){
+    el.textContent=text;
+    if(reduce)return;
+    el.animate([{opacity:0,transform:'translateY(14px)'},{opacity:1,transform:'none'}],{duration:700,delay:delay,easing:'cubic-bezier(.22,.8,.2,1)',fill:'backwards'});
+  }
+
+  function go(i,dir){
+    i=((i%n)+n)%n;
+    var layers=$('#layers');
+    if(i===cur&&layers.children.length)return;
+    if(dir===undefined)dir=i>=cur?1:-1;
+    var s=stops[i],old=[].slice.call(layers.children);
+    var layer=document.createElement('div');layer.className='layer';
+    layer.appendChild(imgEl(s.big,s.name+': иллюстрация'));
+    layers.appendChild(layer);
+    var d=reduce?0:1100;
+    if(old.length){
+      if(d)layer.animate([{opacity:0,transform:'translateX('+(dir*7)+'%) scale(1.05)'},{opacity:1,transform:'translateX(0) scale(1)'}],{duration:d,easing:'cubic-bezier(.22,.8,.2,1)',fill:'both'});
+      old.forEach(function(o){
+        if(!d){o.remove();return;}
+        var a=o.animate([{opacity:1,transform:'translateX(0)'},{opacity:0,transform:'translateX('+(-dir*7)+'%)'}],{duration:d*.85,easing:'cubic-bezier(.4,0,.2,1)',fill:'forwards'});
+        a.onfinish=function(){o.remove();};
+      });
+    }
+    cur=i;
+    $('#counter').textContent=pad2(i+1)+' / '+pad2(n);
+    $('#coords').textContent=fmt(s.lat)+'° с. ш., '+fmt(s.lon)+'° в. д.';
+    swapText($('#year'),s.year,120);
+    swapText($('#yearLabel'),s.yearLabel,180);
+    swapText($('#kind'),s.kind,0);
+    swapText($('#title'),s.name,70);
+    swapText($('#body'),s.body,140);
+    $('#detail').textContent=s.detail;
+    if(!reduce)$('#detailBox').animate([{opacity:0,transform:'translateY(14px)'},{opacity:1,transform:'none'}],{duration:700,delay:210,easing:'cubic-bezier(.22,.8,.2,1)',fill:'backwards'});
+    stopFill();paintTimeline();updateMap();
+    if(auto)startFill();
+  }
+})();
+</script>
+
+</body>
+</html>
